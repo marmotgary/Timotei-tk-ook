@@ -1,0 +1,126 @@
+CREATE TABLE "Pakettiluokka" (
+	"Luokka" INTEGER,
+	"Tilavuus" int NOT NULL,
+	"Nopeus" INTEGER NOT NULL,
+	"Rikkoutuu" INTEGER NOT NULL,
+	"Kantama" INTEGER NOT NULL,
+	--Ei rajata Luokka tai Nopeus attribuuttien mahdollisia arvoja, vaan jätetään avoimeksi silmälläpitäen mahdollista jatkokehitystä
+	PRIMARY KEY("Luokka")
+);
+
+CREATE TABLE "Esine" (
+	"EsineID" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"Rikkoutuva" INTEGER NOT NULL,
+	"Nimi" VARCHAR(70) NOT NULL,
+	"Tilavuus" int NOT NULL,
+	"Paino" DOUBLE NOT NULL
+	
+	
+);
+
+CREATE TABLE "Varasto" (
+	"VarastoID" INTEGER,
+	"Nimi" VARCHAR(70),	
+
+	PRIMARY KEY("VarastoID")
+);
+
+CREATE TABLE "Paketti" (
+	"PakettiID" INTEGER,
+	"Luokka" INTEGER NOT NULL,
+	"VarastoID" INTEGER NOT NULL,
+	"EsineID" INTEGER NOT NULL,
+	"Rikkoutuu" INTEGER NOT NULL,
+	
+	PRIMARY KEY("PakettiID"),
+	
+	FOREIGN KEY("Luokka") REFERENCES "Pakettiluokka"("Luokka"),
+	FOREIGN KEY("VarastoID") REFERENCES "Varasto"("VarastoID"),
+	FOREIGN KEY("EsineID") REFERENCES "Esine"("EsineID")
+);
+
+CREATE TABLE "Henkilötiedot" (
+	"HenkilöID" INTEGER,
+	"Etunimi" VARCHAR(20) NOT NULL,
+	"Sukunimi" VARCHAR(30) NOT NULL,
+
+	PRIMARY KEY("HenkilöID")
+);
+
+CREATE TABLE "TIMOTEImies" (
+	"TimoteiID" INTEGER PRIMARY KEY AUTOINCREMENT, 
+	"HenkilöID" INTEGER,
+
+	FOREIGN KEY("HenkilöID") REFERENCES "Henkilötiedot"("HenkilöID")
+);
+
+CREATE TABLE "Historia" (
+	"HistoriaID" INTEGER PRIMARY KEY AUTOINCREMENT,
+	"Lähtöpaikka" VARCHAR(120) NOT NULL,
+	"Saapumispaikka" VARCHAR(120) NOT NULL,
+	"Matkapituus" INTEGER NOT NULL,
+	"PakettiID" INTEGER NOT NULL,
+	"TimoteiID" INTEGER,
+	"Rikkoutunut" INTEGER NOT NULL,
+	"Aikaleima" TIMESTAMP default CURRENT_TIMESTAMP,
+	
+	FOREIGN KEY("PakettiID") REFERENCES "Paketti"("PakettiID")
+	FOREIGN KEY("TimoteiID") REFERENCES "TIMOTEImies"("TimoteiID")
+	);
+
+CREATE TABLE "Smartpost" (
+	"Postitoimisto" VARCHAR(120) NOT NULL,
+	"Aukiolo" VARCHAR(120) NOT NULL,
+	"VarastoID" INTEGER NOT NULL,
+	
+	PRIMARY KEY("Postitoimisto"),
+	
+	FOREIGN KEY("VarastoID") REFERENCES "Varasto"("VarastoID")
+);
+
+CREATE TABLE "Sijainti" (
+	"SijaintiID" INTEGER,
+	"Kaupunki" VARCHAR(50) NOT NULL,
+	"Osoite" VARCHAR(30) NOT NULL,
+	"Postitoimisto" VARCHAR(120) NOT NULL,
+	
+	PRIMARY KEY("SijaintiID"),
+
+	FOREIGN KEY("Postitoimisto") REFERENCES "Smartpost"("Postitoimisto") ON DELETE CASCADE
+);
+
+CREATE TABLE "Postinumero" (
+	"SijaintiID" INTEGER,
+	"Postinumero" VARCHAR(6) NOT NULL,
+	
+	PRIMARY KEY("SijaintiID"),
+	
+	FOREIGN KEY("SijaintiID") REFERENCES "Sijainti"("SijaintiID") ON DELETE CASCADE
+);
+
+CREATE TABLE "Koordinaatit" (
+	"SijaintiID" INTEGER,
+	"Latitude" VARCHAR(20) NOT NULL,
+	"Longitude" VARCHAR(20) NOT NULL,
+	
+	PRIMARY KEY("SijaintiID"),
+	
+	FOREIGN KEY("SijaintiID") REFERENCES "Sijainti"("SijaintiID") ON DELETE CASCADE
+);
+
+CREATE VIEW "HistoriaNäkymä" AS
+SELECT Lähtöpaikka, Saapumispaikka, Matkapituus, Esine.Nimi, Historia.Rikkoutunut, HistoriaID, Aikaleima
+FROM Historia
+LEFT OUTER JOIN Paketti ON Historia.PakettiID=Paketti.PakettiID
+LEFT OUTER JOIN Esine ON Paketti.EsineID=Esine.EsineID;
+
+CREATE VIEW "SmartpostNäkymä" AS
+SELECT Smartpost.Postitoimisto, Aukiolo, Sijainti.SijaintiID, Kaupunki, Osoite, Postinumero, Latitude, Longitude
+FROM Smartpost
+INNER JOIN Sijainti ON Smartpost.Postitoimisto = Sijainti.Postitoimisto
+INNER JOIN Postinumero ON Sijainti.SijaintiID=Postinumero.SijaintiID
+INNER JOIN Koordinaatit ON Sijainti.SijaintiID=Koordinaatit.SijaintiID;
+
+
+
+

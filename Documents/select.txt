@@ -1,0 +1,26 @@
+SELECT Postitoimisto FROM Smartpost WHERE Postitoimisto=_joku postitoimisto_;
+***tarkistaa onko postitoimistoa tietokannassa, käy läpi kaikki automaatit..
+
+
+SELECT Luokka FROM Pakettiluokka WHERE Luokka=_joku luokka_;
+
+SELECT Paino FROM Esine WHERE esine.esineID=_joku esineID_;
+
+SELECT Nimi FROM Esine
+INNER JOIN "Paketti" ON Esine.EsineID=paketti.EsineID
+WHERE esine.esineID=paketti.esineID;
+
+SELECT Esine.EsineID, Rikkoutuva, Nimi, Tilavuus, Paino FROM Esine
+LEFT JOIN "Paketti" ON Esine.EsineID=paketti.EsineID
+WHERE paketti.esineID IS NULL;
+
+SELECT Paketti.PakettiID, Paketti.EsineID, luokka, nimi, rikkoutuu FROM Paketti
+LEFT OUTER JOIN Esine ON Paketti.EsineID=Esine.EsineID
+LEFT JOIN Historia ON paketti.PakettiID=Historia.PakettiID
+WHERE Historia.PakettiID IS NULL;
+
+SELECT * FROM HistoriaNäkymä;
+
+SELECT COUNT(*) AS total FROM Paketti;
+
+

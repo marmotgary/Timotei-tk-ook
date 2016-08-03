@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="177.0" prefWidth="415.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="timotei.FXMLErrorController">
+   <children>
+      <Label layoutX="14.0" layoutY="23.0" text="Smartpost datan lataus epäonnistui!">
+         <font>
+            <Font size="17.0" />
+         </font>
+      </Label>
+      <Label layoutY="52.0" text="Varmista että tietokoneessasi on toimiva internet yhteys" />
+      <Button fx:id="closeButton" layoutX="101.0" layoutY="114.0" mnemonicParsing="false" onAction="#exitProgramAction" text="Sulje" />
+   </children>
+</AnchorPane>
